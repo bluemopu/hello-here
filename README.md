@@ -1,6 +1,6 @@
 # Hello Here
 
-現在地の周辺で投稿を共有できる、地域交流向けのWebアプリケーションです。学校のチーム開発で、要件整理から画面実装、データベース連携、入力検証、テストまで取り組みました。
+現在地の周辺で投稿を共有できる、地域交流向けのWebアプリケーションです。個人開発として、要件整理、画面実装、データベース設計・連携、入力検証、テストまで一貫して取り組みました。
 
 ## 主な機能
 
@@ -18,11 +18,15 @@
 - Spring Boot 4.1.1
 - Spring MVC / Thymeleaf
 - Spring Data JPA / MySQL
-- Spring Security
+- Spring Security（CSRF対策）
 - Flyway
 - HTML / CSS / JavaScript
+- Geolocation API
+- Leaflet / OpenStreetMap
 - JUnit / Testcontainers
 - Maven
+
+認証はHTTPセッションとSpring MVCのInterceptorを使用して実装しています。
 
 ## セットアップ
 
@@ -34,8 +38,12 @@
 
 ### 2. データベースを作成
 
+MySQLへ管理者ユーザーで接続し、アプリケーション用のデータベースとユーザーを作成します。パスワードは任意の安全な値へ変更してください。
+
 ```sql
 CREATE DATABASE hello_here CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'hellohere'@'localhost' IDENTIFIED BY 'change-this-password';
+GRANT ALL PRIVILEGES ON hello_here.* TO 'hellohere'@'localhost';
 ```
 
 ### 3. 接続情報を環境変数へ設定
@@ -43,7 +51,7 @@ CREATE DATABASE hello_here CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```powershell
 $env:DB_URL = "jdbc:mysql://localhost:3306/hello_here"
 $env:DB_USERNAME = "hellohere"
-$env:DB_PASSWORD = "your-password"
+$env:DB_PASSWORD = "change-this-password"
 ```
 
 ### 4. 起動
@@ -57,16 +65,19 @@ Windows:
 macOS / Linux:
 
 ```bash
+chmod +x mvnw
 ./mvnw spring-boot:run
 ```
 
-起動後、`http://localhost:8080` を開きます。データベースのテーブルはFlywayによって作成・更新されます。
+起動後、`http://localhost:8080/login` を開きます。`http://localhost:8080` からもログイン画面へ移動します。データベースのテーブルはFlywayによって作成・更新されます。
 
 ## テスト
 
 ```powershell
 .\mvnw.cmd test
 ```
+
+通常のテストはインメモリH2データベースを使用します。FlywayのマイグレーションテストはTestcontainersでMySQL 8.4を起動するためDockerが必要です。Dockerを利用できない環境では、このテストだけが自動的にスキップされます。
 
 ## 実装上の工夫
 

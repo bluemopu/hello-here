@@ -17,7 +17,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 class LegacySchemaMigrationTest {
 
     @Container
