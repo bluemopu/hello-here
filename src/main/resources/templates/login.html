@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/login.css" />
+    <title>Login</title>
+  </head>
+  <body>
+    <div class="name">
+      <h1>Hello Here</h1>
+    </div>
+
+    <div class="enter_field">
+      <div class="user_name_box">
+        <img src="/image/person.png" class="person_icon" alt="" />
+        <input
+          type="email"
+          id="email"
+          class="user_name"
+          placeholder="Email"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="password_box">
+        <img src="/image/lock.png" class="lock_icon" alt="" />
+        <input
+          type="password"
+          id="password"
+          class="password"
+          placeholder="Password"
+          autocomplete="current-password"
+        />
+      </div>
+    </div>
+
+    <div class="enter_button">
+      <button type="button" class="login" id="loginButton">Login</button>
+
+      <button type="button" class="sign_up" id="signUpButton">Sign up</button>
+    </div>
+
+    <p id="result"></p>
+
+    <script src="/js/csrf.js"></script>
+    <script src="/js/login.js"></script>
+  </body>
+</html>

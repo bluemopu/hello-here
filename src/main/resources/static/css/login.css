@@ -1,0 +1,118 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  padding-top: 14vh;
+
+  background-image: url("../image/login.background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+h1 {
+  margin: 0;
+}
+
+.name {
+  width: 100%;
+  text-align: center;
+
+  color: white;
+  font-size: 8vmin;
+}
+
+.enter_field {
+  width: 30vw;
+  margin: 0 auto;
+}
+
+.user_name,
+.password {
+  width: 100%;
+
+  color: white;
+  font-size: 3vmin;
+
+  background: transparent;
+
+  border: none;
+  border-bottom: 2px solid white;
+
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.user_name_box,
+.password_box {
+  display: flex;
+  align-items: center;
+  gap: 1vmin;
+}
+
+.user_name_box {
+  margin-top: 17vmin;
+}
+
+.password_box {
+  margin-top: 1.5vmin;
+}
+
+.person_icon {
+  width: 3vmin;
+  height: 3vmin;
+}
+
+.lock_icon {
+  width: 3vmin;
+  height: 3vmin;
+}
+
+.enter_button {
+  display: flex;
+  gap: 2vmin;
+
+  width: 30vw;
+  margin: 3vmin auto 0;
+
+  text-align: center;
+}
+
+.enter_button button {
+  flex: 1;
+  padding: 1.5vmin 0;
+
+  background: transparent;
+  border: none;
+  appearance: none;
+  box-shadow: none;
+  outline: none;
+
+  color: white;
+  font-size: 3vmin;
+
+  cursor: pointer;
+}
+
+.enter_button button:hover {
+  opacity: 0.75;
+}
+
+#result {
+  width: 30vw;
+  margin: 1.5vmin auto 0;
+
+  color: white;
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  text-align: center;
+}

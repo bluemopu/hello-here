@@ -1,0 +1,107 @@
+body {
+  margin: 0;
+  min-height: 100dvh;
+
+  background-color: white;
+  color: black;
+}
+
+.register {
+  min-height: 100dvh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: clamp(1rem, 4vw, 3rem);
+  box-sizing: border-box;
+}
+
+.register_inner {
+  width: min(100%, 28rem);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.register h1 {
+  margin: 0;
+
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.register_title {
+  margin-top: 0.5rem;
+  margin-bottom: clamp(2rem, 5dvh, 3rem);
+
+  color: #666666;
+
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+.register label {
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.register input {
+  width: 100%;
+
+  padding: 0.8rem 0;
+
+  border: none;
+  border-bottom: 0.0625rem solid #999999;
+
+  outline: none;
+
+  background: transparent;
+
+  font-size: 1rem;
+}
+
+.register input:focus {
+  border-bottom-color: black;
+}
+
+#registerButton {
+  margin-top: 2rem;
+
+  padding: 0.9rem 1.5rem;
+
+  border: none;
+  border-radius: 999rem;
+
+  background-color: black;
+  color: white;
+
+  font-size: 1rem;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+#registerButton:hover {
+  opacity: 0.8;
+}
+
+#result {
+  min-height: 1.5rem;
+
+  margin-top: 1rem;
+
+  color: #666666;
+
+  font-size: 0.9rem;
+}
+
+.register a {
+  margin-top: 1rem;
+
+  color: black;
+
+  font-size: 0.9rem;
+  text-align: center;
+}

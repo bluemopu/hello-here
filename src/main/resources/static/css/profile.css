@@ -1,0 +1,414 @@
+body {
+  margin: 0;
+  min-height: 100dvh;
+
+  background-color: white;
+  color: black;
+}
+
+.profile {
+  width: min(100%, 45rem);
+  min-height: 100dvh;
+
+  margin: 0 auto;
+
+  border-left: 0.0625rem solid #dddddd;
+  border-right: 0.0625rem solid #dddddd;
+
+  box-sizing: border-box;
+}
+
+.profile_header {
+  min-height: clamp(3.5rem, 7dvh, 4.5rem);
+
+  padding: 0 clamp(1rem, 2vw, 1.5rem);
+
+  display: flex;
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 1.2rem);
+
+  border-bottom: 0.0625rem solid #dddddd;
+}
+
+.profile_header h1 {
+  margin: 0;
+
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+}
+
+.back_button {
+  border: none;
+  background: transparent;
+
+  font-size: 1.5rem;
+
+  cursor: pointer;
+}
+
+.profile_main {
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.avatar_area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: clamp(0.7rem, 1.5dvh, 1rem);
+
+  margin-bottom: clamp(2rem, 5dvh, 3rem);
+}
+
+.profile_avatar {
+  width: clamp(6rem, 12vw, 9rem);
+  aspect-ratio: 1 / 1;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  background-color: #eeeeee;
+
+  border: 0.0625rem solid #dddddd;
+}
+
+.avatar_button,
+.avatar_upload_button {
+  padding: clamp(0.5rem, 1dvh, 0.7rem) clamp(1rem, 2vw, 1.5rem);
+
+  border-radius: 999rem;
+
+  font-size: 0.9rem;
+
+  cursor: pointer;
+}
+
+.avatar_button {
+  border: 0.0625rem solid #cccccc;
+
+  background-color: white;
+  color: black;
+}
+
+.avatar_upload_button {
+  border: none;
+
+  background-color: black;
+  color: white;
+}
+
+.avatar_button:hover,
+.avatar_upload_button:hover {
+  opacity: 0.75;
+}
+
+.avatar_editor_dialog {
+  width: min(90vw, 34rem);
+
+  padding: 0;
+
+  border: none;
+  border-radius: 1rem;
+
+  background-color: white;
+}
+
+.avatar_editor_dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.avatar_editor {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.avatar_editor h2 {
+  margin-top: 0;
+
+  text-align: center;
+
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+}
+
+.crop_area {
+  width: (100%, 25rem);
+  aspect-ratio: 1 / 1;
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  background-color: #eeeeee;
+}
+
+#avatarCanvas {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  cursor: grab;
+
+  touch-action: none;
+}
+
+#avatarCanvas:active {
+  cursor: grabbing;
+}
+
+.zoom_area {
+  margin-top: 1.2rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+#avatarzoom {
+  flex: 1;
+}
+
+.rotate_buttons,
+.editor_buttons {
+  margin-top: 1rem;
+
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.rotate_buttons button,
+.editor_buttons button {
+  padding: 0.7rem 1.2rem;
+
+  border-radius: 999rem;
+
+  cursor: pointer;
+}
+
+.rotate_buttons button,
+#cancelAvatarButton {
+  border: 0.0625rem solid #cccccc;
+
+  background-color: white;
+  color: black;
+}
+
+#applyAvatarButton {
+  border: none;
+
+  background-color: black;
+  color: white;
+}
+
+.rotate .profile_field {
+  margin-top: clamp(1.5rem, 3vdh, 2rem);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.5rem;
+}
+
+.profile_field label {
+  font-size: 0.85rem;
+  font-weight: bold;
+
+  color: #666666;
+}
+
+.profile_field input,
+.profile_field textarea {
+  width: 100%;
+
+  padding: 0.8rem 0;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-bottom: 0.0625rem solid #aaaaaa;
+
+  background: transparent;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.profile_field textarea {
+  min-height: 8rem;
+
+  resize: vertical;
+}
+
+.profile_posts {
+  margin-top: clamp(2rem, 5dvh, 3rem);
+
+  border-top: 0.0625rem solid #dddddd;
+}
+
+.posts_header {
+  padding: clamp(1rem, 2vm, 1.4rem);
+
+  border-bottom: 0.0625rem solid #dddddd;
+
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  font-weight: bold;
+}
+
+.profile_post {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: clamp(1rem, 2vw, 1.5rem);
+
+  padding: clamp(1rem, 2vw, 1.5rem);
+
+  border-bottom: 0.0625rem solid #eeeeee;
+
+  transition: background-color 0.2s;
+}
+
+.profile_post:hover {
+  background-color: #fafafa;
+}
+
+.profile_post_body {
+  flex: 1;
+  min-width: 0;
+}
+
+.delete_post_button {
+  flex-shrink: 0;
+
+  padding: 0.4rem 0.8rem;
+
+  border: 0.0625rem solid #cccccc;
+  border-radius: 999rem;
+
+  background-color: white;
+  color: #555555;
+
+  font-size: 0.8rem;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.delete_post_button:hover {
+  background-color: black;
+  color: white;
+
+  border-color: black;
+}
+
+.profile_post_content {
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.profile_post_images {
+  width: 100%;
+
+  margin-top: clamp(0.7rem, 1.5dvh, 1rem);
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: clamp(0.25rem, 0.5vw, 0.5rem);
+
+  overflow: hidden;
+
+  border-radius: 0.8rem;
+}
+
+.profile_post_image {
+  width: 100%;
+  height: 100%;
+
+  aspect-ratio: 1 / 1;
+
+  object-fit: cover;
+
+  display: block;
+
+  background-color: #eeeeee;
+}
+
+.profile_post_images:has(.profile_post_image:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.profile_post_images:has(.profile_post_image:only-child) .profile_post_image {
+  max-height: 30rem;
+
+  aspect-ratio: auto;
+
+  object-fit: contain;
+}
+
+.profile_post_date {
+  display: block;
+
+  margin-top: 0.7rem;
+
+  color: #888888;
+
+  font-size: clamp(0.75rem, 0.9vw, 0.9rem);
+}
+
+.no_profile_posts {
+  padding: clamp(2rem, 5dvh, 3rem);
+
+  text-align: center;
+
+  color: #888888;
+}
+
+.readonly_value {
+  padding: 0.8rem 0;
+
+  border-bottom: 0.0625rem solid #eeeeee;
+
+  color: #555555;
+}
+
+.save_button {
+  width: 100%;
+
+  margin-top: clamp(2rem, 5dvh, 3rem);
+
+  padding: 0.9rem;
+
+  border: none;
+  border-radius: 999rem;
+
+  background-color: black;
+  color: white;
+
+  font-weight: bold;
+  font-size: 1rem;
+
+  cursor: pointer;
+}
+
+.save_button:hover {
+  opacity: 0.8;
+}
+
+#result {
+  min-height: 1.5rem;
+
+  margin-top: 1rem;
+
+  text-align: center;
+
+  color: #666666;
+}

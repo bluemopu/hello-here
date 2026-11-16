@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/profile.css" />
+  </head>
+  <body>
+    <main class="profile">
+      <div class="profile_header">
+        <button
+          type="button"
+          class="back_button"
+          onclick="location.href = '/home'"
+        >
+          ←
+        </button>
+
+        <h1>Profile</h1>
+      </div>
+
+      <div class="profile_main">
+        <div class="avatar_area">
+          <img
+            id="profileAvatar"
+            class="profile_avatar"
+            th:src="${profile.avatarUrl != null ? profile.avatarUrl: '/image/default_avatar.png'}"
+            alt="プロフィール画像"
+          />
+
+          <input
+            type="file"
+            id="avatarInput"
+            accept="image/png, image/jpeg, image/gif"
+            hidden
+          />
+
+          <button type="button" id="selectAvatarButton" class="avatar_button">
+            画像を選択
+          </button>
+
+          <button
+            type="button"
+            id="uploadAvatarButton"
+            class="avatar_upload_button"
+          >
+            アイコンを変更
+          </button>
+        </div>
+
+        <dialog id="avatarEditorDialog" class="avatar_editor_dialog">
+          <div class="avatar_editor">
+            <h2>プロフィール画像を編集</h2>
+
+            <div class="crop_area">
+              <canvas id="avatarCanvas" width="400" height="400"></canvas>
+            </div>
+
+            <div class="zoom_area">
+              <span>縮小</span>
+
+              <input
+                type="range"
+                id="avatarZoom"
+                min="1"
+                max="3"
+                step="0.01"
+                value="1"
+              />
+
+              <span>拡大</span>
+            </div>
+
+            <div class="rotate_buttons">
+              <button type="button" id="rotateLeftButton">↶ 左へ回転</button>
+
+              <button type="button" id="rotateRightButton">右へ回転 ↷</button>
+            </div>
+
+            <div class="editor_buttons">
+              <button type="button" id="cancelAvatarButton">キャンセル</button>
+
+              <button type="button" id="applyAvatarButton">
+                この範囲で決定
+              </button>
+            </div>
+          </div>
+        </dialog>
+
+        <div class="profile_field">
+          <label for="displayName"> Display name </label>
+
+          <input
+            type="text"
+            id="displayName"
+            th:value="${profile.displayName}"
+          />
+        </div>
+
+        <div class="profile_field">
+          <label>Name</label>
+
+          <div class="readonly_value" th:text="${profile.name}"></div>
+        </div>
+
+        <div class="profile_field">
+          <label for="bio">Bio</label>
+
+          <textarea
+            id="bio"
+            th:text="${profile.bio}"
+            placeholder="自己紹介を入力"
+          ></textarea>
+        </div>
+
+        <button id="saveProfileButton" class="save_button">Save</button>
+
+        <p id="result"></p>
+      </div>
+
+      <section class="profile_posts">
+        <div class="posts_header">Posts</div>
+
+        <div class="no_profile_posts" th:if="${#lists.isEmpty(posts)}">
+          まだ投稿はありません
+        </div>
+
+        <article
+          class="profile_post"
+          th:each="post : ${posts}"
+          th:attr="data-post-id=${post.id}"
+        >
+          <div class="profile_post_body">
+            <div
+              class="profile_post_content"
+              th:if="${post.content != null and !#strings.isEmpty(post.content)}"
+              th:text="${post.content}"
+            ></div>
+
+            <div
+              class="profile_post_images"
+              th:if="${post.imageUrls != null and !#lists.isEmpty(post.imageUrls)}"
+            >
+              <img
+                class="profile_post_image"
+                th:each="imageUrl : ${post.imageUrls}"
+                th:src="${imageUrl}"
+                alt="投稿画像"
+              />
+            </div>
+
+            <time
+              class="profile_post_date"
+              th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}"
+            ></time>
+          </div>
+
+          <button
+            type="button"
+            class="delete_post_button"
+            th:attr="data-post-id=${post.id}"
+          >
+            削除
+          </button>
+        </article>
+      </section>
+    </main>
+
+    <script src="/js/csrf.js"></script>
+    <script src="/js/profile.js"></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <title>Home</title>
+
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+
+  <body>
+    <div class="home">
+      <div class="menu">
+        <div class="menu_inner">
+          <button onclick="location.href = '/home'" class="menu_button">
+            Home
+          </button>
+
+          <button onclick="location.href = '/profile'" class="menu_button">
+            Profile
+          </button>
+
+          <button class="open_modal">
+            <img src="/image/postbutton_icon.png" alt="" />
+          </button>
+
+          <button class="menu_button" id="logoutButton">Logout</button>
+        </div>
+      </div>
+
+      <main class="timeline">
+        <div class="timeline_header">Home</div>
+
+        <div id="nearbyPosts"></div>
+      </main>
+
+      <aside class="map_area">
+        <div class="map_title">Map</div>
+
+        <div id="map"></div>
+
+        <div class="map_description">Posts within 100m</div>
+      </aside>
+    </div>
+
+    <div class="modal">
+      <dialog class="dialog">
+        <div>投稿</div>
+
+        <textarea
+          id="content"
+          placeholder="たのしかった"
+          required
+        ></textarea>
+
+        <div class="post_image_area">
+          <input
+            type="file"
+            id="postImageInput"
+            accept="image/png, image/jpeg"
+            multiple
+            hidden
+          />
+
+          <button
+            type="button"
+            id="selectPostImageButton"
+            class="select_post_image_button"
+          >
+            画像を追加
+          </button>
+
+          <div id="postImagePreview" class="post_image_preview"></div>
+        </div>
+
+        <button class="post" id="postButton">投稿</button>
+
+        <button id="close_modal">閉じる</button>
+
+        <p id="result"></p>
+      </dialog>
+    </div>
+
+    <script src="/js/csrf.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/nearbyPosts.js"></script>
+    <script src="/js/postFunction.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/logout.js"></script>
+  </body>
+</html>
