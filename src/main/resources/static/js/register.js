@@ -1,6 +1,10 @@
 const registerButton = document.getElementById("registerButton");
 
-registerButton.addEventListener("click", function () {
+const registerForm = document.getElementById("registerForm");
+
+registerForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
   const name = document.getElementById("name").value.trim();
 
   const email = document.getElementById("email").value.trim();
@@ -26,6 +30,9 @@ registerButton.addEventListener("click", function () {
 
     return;
   }
+
+  registerButton.disabled = true;
+  result.textContent = "登録しています...";
 
   csrfFetch("/register", {
     method: "POST",
@@ -58,5 +65,8 @@ registerButton.addEventListener("click", function () {
       console.error(error);
 
       result.textContent = error.message;
+    })
+    .finally(() => {
+      registerButton.disabled = false;
     });
 });

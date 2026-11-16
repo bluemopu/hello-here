@@ -3,6 +3,7 @@ package com.hellohere.hello_here.service;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -15,7 +16,7 @@ public final class ImageFileValidator {
     private ImageFileValidator() {
     }
 
-    public static ImageDimensions inspectHeader(MultipartFile file) {
+    public static ImageMetadata inspectHeader(MultipartFile file) {
         try (ImageInputStream input = ImageIO.createImageInputStream(file.getInputStream())) {
             if (input == null) {
                 throw invalidImage();
@@ -31,7 +32,8 @@ public final class ImageFileValidator {
 
             try {
                 reader.setInput(input, true, true);
-                return new ImageDimensions(reader.getWidth(0), reader.getHeight(0));
+                return new ImageMetadata(reader.getWidth(0), reader.getHeight(0),
+                        normalizeFormatName(reader.getFormatName()));
             } finally {
                 reader.dispose();
             }
@@ -51,7 +53,11 @@ public final class ImageFileValidator {
             if (image == null) {
                 throw invalidImage();
             }
-        } catch (IOException exception) {
+        } catch (IOException | RuntimeException exception) {
+            if (exception instanceof IllegalArgumentException illegalArgumentException) {
+                throw illegalArgumentException;
+            }
+
             throw new IllegalArgumentException("正しい画像ファイルではありません", exception);
         }
     }
@@ -60,6 +66,11 @@ public final class ImageFileValidator {
         return new IllegalArgumentException("正しい画像ファイルではありません");
     }
 
-    public record ImageDimensions(int width, int height) {
+    private static String normalizeFormatName(String formatName) {
+        String normalized = formatName.toLowerCase(Locale.ROOT);
+        return "jpg".equals(normalized) ? "jpeg" : normalized;
+    }
+
+    public record ImageMetadata(int width, int height, String formatName) {
     }
 }

@@ -1,9 +1,7 @@
 package com.hellohere.hello_here.dto;
 
-import java.util.List;
-
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 public class ProfilePostDto {
 

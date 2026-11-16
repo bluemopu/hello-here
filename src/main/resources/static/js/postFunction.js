@@ -27,6 +27,16 @@ postButton.addEventListener("click", function () {
     return;
   }
 
+  if (!navigator.geolocation) {
+    document.getElementById("result").textContent =
+      "このブラウザでは位置情報を利用できません";
+    return;
+  }
+
+  postButton.disabled = true;
+  document.getElementById("result").textContent =
+    "位置情報を取得しています...";
+
   navigator.geolocation.getCurrentPosition(
     function (position) {
       const latitude = position.coords.latitude;
@@ -41,8 +51,6 @@ postButton.addEventListener("click", function () {
       for (const image of selectedPostImages) {
         formData.append("images", image);
       }
-
-      postButton.disabled = true;
 
       csrfFetch("/posts", {
         method: "POST",
@@ -98,8 +106,11 @@ postButton.addEventListener("click", function () {
     function (error) {
       console.error(error);
 
-      alert("現在地を取得できませんでした");
+      document.getElementById("result").textContent =
+        "現在地を取得できませんでした。位置情報の許可を確認してください";
+      postButton.disabled = false;
     },
+    { timeout: 10000, maximumAge: 30000 },
   );
 });
 
@@ -161,7 +172,7 @@ function renderPostImagePreview() {
     const previewUrl = URL.createObjectURL(file);
 
     image.src = previewUrl;
-    image.alt = "投稿画像";
+    image.alt = `選択した投稿画像 ${index + 1}`;
 
     image.onload = function () {
       URL.revokeObjectURL(previewUrl);
@@ -171,6 +182,10 @@ function renderPostImagePreview() {
 
     removeButton.type = "button";
     removeButton.textContent = "×";
+    removeButton.setAttribute(
+      "aria-label",
+      `選択した投稿画像 ${index + 1} を削除`,
+    );
 
     removeButton.classList.add("post_image_remove_button");
 

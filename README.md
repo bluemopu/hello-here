@@ -6,9 +6,9 @@
 
 - ユーザー登録・ログイン・ログアウト
 - プロフィールの表示・編集、アバター画像の登録
-- 現在地を使った周辺投稿の表示
-- テキストと画像を含む投稿の作成・削除
-- 投稿者本人だけが削除できるアクセス制御
+- 現在地から100m以内の投稿を距離順で表示（最大100件）
+- テキストと画像を含む投稿の作成
+- 投稿者本人だけが実行できる投稿の論理削除
 - CSRF対策、パスワードのArgon2ハッシュ化
 - サーバー側の入力値・画像ファイル検証
 
@@ -23,10 +23,15 @@
 - HTML / CSS / JavaScript
 - Geolocation API
 - Leaflet / OpenStreetMap
-- JUnit / Testcontainers
+- JUnit / Mockito / H2 / Testcontainers
 - Maven
 
-認証はHTTPセッションとSpring MVCのInterceptorを使用して実装しています。
+## 設計概要
+
+- Controller、Service、Repositoryに責務を分割しています。
+- 認証はHTTPセッションとSpring MVCのInterceptorで実装し、保護対象の画面とAPIへの未ログインアクセスを制御しています。
+- データベース構造の変更はFlywayのマイグレーションで管理しています。
+- 周辺投稿はMySQLの`ST_Distance_Sphere`で距離を計算し、100m以内を近い順に最大100件取得します。
 
 ## セットアップ
 
@@ -48,10 +53,20 @@ GRANT ALL PRIVILEGES ON hello_here.* TO 'hellohere'@'localhost';
 
 ### 3. 接続情報を環境変数へ設定
 
+Windows（PowerShell）:
+
 ```powershell
 $env:DB_URL = "jdbc:mysql://localhost:3306/hello_here"
 $env:DB_USERNAME = "hellohere"
 $env:DB_PASSWORD = "change-this-password"
+```
+
+macOS / Linux:
+
+```bash
+export DB_URL="jdbc:mysql://localhost:3306/hello_here"
+export DB_USERNAME="hellohere"
+export DB_PASSWORD="change-this-password"
 ```
 
 ### 4. 起動
@@ -73,19 +88,27 @@ chmod +x mvnw
 
 ## テスト
 
+Windows（PowerShell）:
+
 ```powershell
 .\mvnw.cmd test
+```
+
+macOS / Linux:
+
+```bash
+./mvnw test
 ```
 
 通常のテストはインメモリH2データベースを使用します。FlywayのマイグレーションテストはTestcontainersでMySQL 8.4を起動するためDockerが必要です。Dockerを利用できない環境では、このテストだけが自動的にスキップされます。
 
 ## 実装上の工夫
 
-- 位置情報を利用し、近隣の投稿を距離で絞り込む機能を実装しました。
+- 位置情報を利用し、現在地から100m以内の投稿を距離順で最大100件取得します。
+- 投稿IDとログインユーザーIDの両方で対象を検索し、本人の投稿だけを論理削除できるようにしています。
 - パスワードは平文で保存せず、Argon2でハッシュ化しています。
-- CSRF対策に加え、投稿・プロフィール更新時の入力値と画像をサーバー側でも検証しています。
-- Flywayによるマイグレーションで、データベース構造の変更履歴を管理しています。
-- Controller、Service、Repositoryへ責務を分け、保守しやすい構成を意識しました。
+- CSRF対策に加え、投稿・プロフィール更新時の入力値と画像の実体形式をサーバー側でも検証しています。
+- 画像保存後にデータベース更新がロールバックされた場合は、保存済みファイルも削除して不整合を防ぎます。
 
 入力値の詳しい制約は [`docs/input-validation.md`](docs/input-validation.md) を参照してください。
 

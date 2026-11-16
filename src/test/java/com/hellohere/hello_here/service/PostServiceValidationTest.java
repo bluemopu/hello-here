@@ -63,6 +63,30 @@ class PostServiceValidationTest {
     }
 
     @Test
+    void rejectsGifDisguisedAsPng() throws Exception {
+        MockMultipartFile image = imageFile("gif", "image/png");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> postService.savePostWithImages("content", BigDecimal.ZERO,
+                        BigDecimal.ZERO, 1L, List.of(image)));
+
+        assertEquals("画像ファイルの形式とContent-Typeが一致しません", exception.getMessage());
+        verifyNoInteractions(postRepository, userRepository, postImageRepository);
+    }
+
+    @Test
+    void rejectsJpegWhoseDeclaredContentTypeIsPng() throws Exception {
+        MockMultipartFile image = imageFile("jpeg", "image/png");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> postService.savePostWithImages("content", BigDecimal.ZERO,
+                        BigDecimal.ZERO, 1L, List.of(image)));
+
+        assertEquals("画像ファイルの形式とContent-Typeが一致しません", exception.getMessage());
+        verifyNoInteractions(postRepository, userRepository, postImageRepository);
+    }
+
+    @Test
     void rejectsOutOfRangeCoordinatesBeforeSaving() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> postService.savePostWithImages("content", new BigDecimal("90.1"),
@@ -78,5 +102,13 @@ class PostServiceValidationTest {
         ImageIO.write(image, "png", output);
         return new MockMultipartFile(
                 "images", "image.png", "image/png", output.toByteArray());
+    }
+
+    private MockMultipartFile imageFile(String format, String contentType) throws Exception {
+        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(image, format, output);
+        return new MockMultipartFile(
+                "images", "image." + format, contentType, output.toByteArray());
     }
 }

@@ -2,9 +2,13 @@ const loginButton = document.getElementById("loginButton");
 
 const signUpButton = document.getElementById("signUpButton");
 
+const loginForm = document.getElementById("loginForm");
+
 const result = document.getElementById("result");
 
-loginButton.addEventListener("click", function () {
+loginForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
   const email = document.getElementById("email").value.trim();
 
   const password = document.getElementById("password").value;
@@ -14,6 +18,9 @@ loginButton.addEventListener("click", function () {
 
     return;
   }
+
+  loginButton.disabled = true;
+  result.textContent = "ログインしています...";
 
   csrfFetch("/login", {
     method: "POST",
@@ -41,6 +48,9 @@ loginButton.addEventListener("click", function () {
       console.error(error);
 
       result.textContent = "メールアドレスまたはパスワードが違います";
+    })
+    .finally(() => {
+      loginButton.disabled = false;
     });
 });
 

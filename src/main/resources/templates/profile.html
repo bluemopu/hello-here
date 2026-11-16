@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,6 +15,7 @@
         <button
           type="button"
           class="back_button"
+          aria-label="ホームに戻る"
           onclick="location.href = '/home'"
         >
           ←
@@ -52,9 +53,13 @@
           </button>
         </div>
 
-        <dialog id="avatarEditorDialog" class="avatar_editor_dialog">
+        <dialog
+          id="avatarEditorDialog"
+          class="avatar_editor_dialog"
+          aria-labelledby="avatarEditorTitle"
+        >
           <div class="avatar_editor">
-            <h2>プロフィール画像を編集</h2>
+            <h2 id="avatarEditorTitle">プロフィール画像を編集</h2>
 
             <div class="crop_area">
               <canvas id="avatarCanvas" width="400" height="400"></canvas>
@@ -70,6 +75,7 @@
                 max="3"
                 step="0.01"
                 value="1"
+                aria-label="画像の拡大率"
               />
 
               <span>拡大</span>
@@ -98,6 +104,7 @@
             type="text"
             id="displayName"
             th:value="${profile.displayName}"
+            required
           />
         </div>
 
@@ -117,9 +124,11 @@
           ></textarea>
         </div>
 
-        <button id="saveProfileButton" class="save_button">Save</button>
+        <button type="button" id="saveProfileButton" class="save_button">
+          Save
+        </button>
 
-        <p id="result"></p>
+        <p id="result" role="status" aria-live="polite"></p>
       </div>
 
       <section class="profile_posts">
@@ -155,6 +164,7 @@
 
             <time
               class="profile_post_date"
+              th:attr="datetime=${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss')}"
               th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}"
             ></time>
           </div>

@@ -15,18 +15,29 @@
 
   <body>
     <main class="register">
-      <div class="register_inner">
+      <form id="registerForm" class="register_inner">
         <h1>Hello Here</h1>
 
         <p class="register_title">アカウントを作成</p>
 
         <label for="name"> ユーザー名 </label>
 
-        <input type="text" id="name" autocomplete="username" />
+        <input
+          type="text"
+          id="name"
+          autocomplete="username"
+          required
+        />
 
         <label for="email"> メールアドレス </label>
 
-        <input type="email" id="email" autocomplete="email" />
+        <input
+          type="email"
+          id="email"
+          autocomplete="email"
+          maxlength="255"
+          required
+        />
 
         <label for="password"> パスワード </label>
 
@@ -36,14 +47,15 @@
           minlength="8"
           maxlength="128"
           autocomplete="new-password"
+          required
         />
 
-        <button id="registerButton">登録</button>
+        <button type="submit" id="registerButton">登録</button>
 
-        <p id="result"></p>
+        <p id="result" role="status" aria-live="polite"></p>
 
         <a href="/login"> すでにアカウントをお持ちですか？ </a>
-      </div>
+      </form>
     </main>
 
     <script src="/js/csrf.js"></script>

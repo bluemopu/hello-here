@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="/css/home.css" />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="anonymous"
     />
   </head>
 
@@ -28,7 +30,7 @@
             Profile
           </button>
 
-          <button class="open_modal">
+          <button type="button" class="open_modal" aria-label="投稿を作成">
             <img src="/image/postbutton_icon.png" alt="" />
           </button>
 
@@ -39,26 +41,33 @@
       <main class="timeline">
         <div class="timeline_header">Home</div>
 
-        <div id="nearbyPosts"></div>
+        <div id="nearbyPosts" aria-live="polite" aria-busy="true">
+          <div class="no_posts">近くの投稿を読み込んでいます...</div>
+        </div>
       </main>
 
       <aside class="map_area">
         <div class="map_title">Map</div>
 
-        <div id="map"></div>
+        <div id="map" role="region" aria-label="現在地周辺の地図"></div>
 
         <div class="map_description">Posts within 100m</div>
+
+        <p id="mapStatus" class="map_status" role="status" aria-live="polite">
+          現在地を取得しています...
+        </p>
       </aside>
     </div>
 
     <div class="modal">
-      <dialog class="dialog">
-        <div>投稿</div>
+      <dialog class="dialog" aria-labelledby="postDialogTitle">
+        <h2 id="postDialogTitle">投稿</h2>
+
+        <label class="visually_hidden" for="content">投稿内容</label>
 
         <textarea
           id="content"
           placeholder="たのしかった"
-          required
         ></textarea>
 
         <div class="post_image_area">
@@ -81,16 +90,20 @@
           <div id="postImagePreview" class="post_image_preview"></div>
         </div>
 
-        <button class="post" id="postButton">投稿</button>
+        <button type="button" class="post" id="postButton">投稿</button>
 
-        <button id="close_modal">閉じる</button>
+        <button type="button" id="close_modal">閉じる</button>
 
-        <p id="result"></p>
+        <p id="result" role="status" aria-live="polite"></p>
       </dialog>
     </div>
 
     <script src="/js/csrf.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin="anonymous"
+    ></script>
     <script src="/js/nearbyPosts.js"></script>
     <script src="/js/postFunction.js"></script>
     <script src="/js/modal.js"></script>

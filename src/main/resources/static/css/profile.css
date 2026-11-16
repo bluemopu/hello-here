@@ -130,7 +130,7 @@ body {
 }
 
 .crop_area {
-  width: (100%, 25rem);
+  width: min(100%, 25rem);
   aspect-ratio: 1 / 1;
 
   margin: 0 auto;
@@ -163,7 +163,7 @@ body {
   gap: 0.8rem;
 }
 
-#avatarzoom {
+#avatarZoom {
   flex: 1;
 }
 
@@ -200,8 +200,8 @@ body {
   color: white;
 }
 
-.rotate .profile_field {
-  margin-top: clamp(1.5rem, 3vdh, 2rem);
+.profile_field {
+  margin-top: clamp(1.5rem, 3dvh, 2rem);
 
   display: flex;
   flex-direction: column;
@@ -229,8 +229,6 @@ body {
 
   background: transparent;
 
-  outline: none;
-
   font-family: inherit;
   font-size: 1rem;
 }
@@ -248,7 +246,7 @@ body {
 }
 
 .posts_header {
-  padding: clamp(1rem, 2vm, 1.4rem);
+  padding: clamp(1rem, 2vw, 1.4rem);
 
   border-bottom: 0.0625rem solid #dddddd;
 
@@ -359,7 +357,7 @@ body {
 
   margin-top: 0.7rem;
 
-  color: #888888;
+  color: #666666;
 
   font-size: clamp(0.75rem, 0.9vw, 0.9rem);
 }
@@ -369,7 +367,7 @@ body {
 
   text-align: center;
 
-  color: #888888;
+  color: #666666;
 }
 
 .readonly_value {

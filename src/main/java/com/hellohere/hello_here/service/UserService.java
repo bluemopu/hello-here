@@ -1,10 +1,10 @@
 package com.hellohere.hello_here.service;
 
-import java.time.LocalDateTime;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -15,11 +15,11 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hellohere.hello_here.dto.ProfileDto;
 import com.hellohere.hello_here.entity.User;
 import com.hellohere.hello_here.entity.UserProfile;
 import com.hellohere.hello_here.repository.UserProfileRepository;
 import com.hellohere.hello_here.repository.UserRepository;
-import com.hellohere.hello_here.dto.ProfileDto;
 
 import jakarta.transaction.Transactional;
 
@@ -27,14 +27,10 @@ import jakarta.transaction.Transactional;
 public class UserService {
     private static final int MAX_NAME_LENGTH = 50;
     private static final int MAX_BIO_LENGTH = 160;
-
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
     private static final long MAX_AVATAR_FILE_SIZE = 5L * 1024 * 1024;
-
     private static final int MIN_AVATAR_SIZE = 200;
-
-    private static final int MAX_AVATAR_SIZE = 8000;
+    private static final int MAX_AVATAR_SIZE = 4096;
 
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
@@ -47,7 +43,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     @Transactional
     public User register(String email, String name, String password) {
         validateName(name, "ユーザー名");
@@ -57,35 +52,28 @@ public class UserService {
         }
 
         User user = new User();
-
         user.setEmail(email);
         user.setName(name);
-
         user.setPasswordHash(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(user);
 
         UserProfile profile = new UserProfile();
-
         profile.setUserId(savedUser.getId());
         profile.setDisplayName(name);
 
         LocalDateTime now = LocalDateTime.now();
-
         profile.setCreatedAt(now);
         profile.setUpdatedAt(now);
-
         userProfileRepository.save(profile);
 
-
         return savedUser;
-
     }
 
     public User login(String email, String password) {
-
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("メールアドレスまたはパスワードが違います"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "メールアドレスまたはパスワードが違います"));
 
         if (user.getDeletedAt() != null) {
             throw new IllegalArgumentException("メールアドレスまたはパスワードが違います");
@@ -95,9 +83,7 @@ public class UserService {
             throw new IllegalArgumentException("メールアドレスまたはパスワードが違います");
         }
 
-
         return user;
-
     }
 
     public ProfileDto getProfile(Long userId) {
@@ -135,40 +121,43 @@ public class UserService {
             throw new IllegalArgumentException("画像を選択してください");
         }
 
-        String contentsType = file.getContentType();
+        String contentType = file.getContentType();
         String extension;
+        String expectedFormat;
 
-        if ("image/png".equals(contentsType)) {
+        if ("image/png".equals(contentType)) {
             extension = ".png";
-        } else if ("image/jpeg".equals((contentsType))) {
+            expectedFormat = "png";
+        } else if ("image/jpeg".equals(contentType)) {
             extension = ".jpg";
-        } else if ("image/gif".equals((contentsType))) {
+            expectedFormat = "jpeg";
+        } else if ("image/gif".equals(contentType)) {
             extension = ".gif";
+            expectedFormat = "gif";
         } else {
             throw new IllegalArgumentException("PNG、JPEGまたはGIF画像を選択してください");
         }
 
         if (file.getSize() > MAX_AVATAR_FILE_SIZE) {
-
             throw new IllegalArgumentException("画像サイズは5MB以下にしてください");
         }
 
-        ImageFileValidator.ImageDimensions dimensions = ImageFileValidator.inspectHeader(file);
+        ImageFileValidator.ImageMetadata metadata = ImageFileValidator.inspectHeader(file);
 
-        int imageWidth = dimensions.width();
+        if (!expectedFormat.equals(metadata.formatName())) {
+            throw new IllegalArgumentException(
+                    "画像ファイルの形式とContent-Typeが一致しません");
+        }
 
-        int imageHeight = dimensions.height();
-
+        int imageWidth = metadata.width();
+        int imageHeight = metadata.height();
 
         if (imageWidth < MIN_AVATAR_SIZE || imageHeight < MIN_AVATAR_SIZE) {
-
             throw new IllegalArgumentException("画像は縦横200px以上にしてください");
         }
 
-
         if (imageWidth > MAX_AVATAR_SIZE || imageHeight > MAX_AVATAR_SIZE) {
-
-            throw new IllegalArgumentException("画像は縦横8000px以下にしてください");
+            throw new IllegalArgumentException("画像は縦横4096px以下にしてください");
         }
 
         ImageFileValidator.verifyDecodable(file);
@@ -188,9 +177,10 @@ public class UserService {
             profile.setAvatarUrl(avatarUrl);
             profile.setUpdatedAt(LocalDateTime.now());
             userProfileRepository.saveAndFlush(profile);
-        } catch (Exception e) {
+            registerRollbackCleanup(savePath);
+        } catch (Exception exception) {
             Files.deleteIfExists(savePath);
-            throw e;
+            throw exception;
         }
 
         if (oldAvatarUrl != null && oldAvatarUrl.startsWith("/uploads/avatars/")) {
@@ -198,25 +188,50 @@ public class UserService {
             Path oldFilePath = avatarDirectory.resolve(oldFileName).normalize();
 
             if (oldFilePath.startsWith(avatarDirectory)) {
-                TransactionSynchronizationManager
-                        .registerSynchronization(new TransactionSynchronization() {
-
-                            @Override
-                            public void afterCommit() {
-
-                                try {
-                                    Files.deleteIfExists(oldFilePath);
-                                } catch (IOException e) {
-                                    log.warn("古いプロフィール画像を削除できません: {}", oldFilePath, e);
-                                }
-                            }
-                        });
+                deleteAfterCommit(oldFilePath);
             }
-
         }
 
-
         return avatarUrl;
+    }
+
+    private void registerRollbackCleanup(Path newFilePath) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (status != TransactionSynchronization.STATUS_COMMITTED) {
+                            deleteImageFile(newFilePath, "ロールバック後のプロフィール画像");
+                        }
+                    }
+                });
+    }
+
+    private void deleteAfterCommit(Path oldFilePath) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            deleteImageFile(oldFilePath, "古いプロフィール画像");
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        deleteImageFile(oldFilePath, "古いプロフィール画像");
+                    }
+                });
+    }
+
+    private void deleteImageFile(Path filePath, String description) {
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException exception) {
+            log.warn("{}を削除できません: {}", description, filePath, exception);
+        }
     }
 
     private void validateName(String value, String fieldName) {

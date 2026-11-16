@@ -1,4 +1,14 @@
 function loadNearbyPosts() {
+  const nearbyPosts = document.getElementById("nearbyPosts");
+
+  nearbyPosts.setAttribute("aria-busy", "true");
+
+  if (!navigator.geolocation) {
+    nearbyPosts.setAttribute("aria-busy", "false");
+    nearbyPosts.textContent = "このブラウザでは位置情報を利用できません";
+    return;
+  }
+
   navigator.geolocation.getCurrentPosition(
     function (position) {
       const latitude = position.coords.latitude;
@@ -34,6 +44,7 @@ function loadNearbyPosts() {
           const nearbyPosts = document.getElementById("nearbyPosts");
 
           nearbyPosts.innerHTML = "";
+          nearbyPosts.setAttribute("aria-busy", "false");
 
           if (posts.length === 0) {
             const message = document.createElement("div");
@@ -65,6 +76,8 @@ function loadNearbyPosts() {
             } else {
               iconElement.src = "/image/default_avatar.png";
             }
+
+            iconElement.alt = "";
 
             const nameElement = document.createElement("div");
 
@@ -145,6 +158,7 @@ function loadNearbyPosts() {
 
           const nearbyPosts = document.getElementById("nearbyPosts");
 
+          nearbyPosts.setAttribute("aria-busy", "false");
           nearbyPosts.textContent = "投稿を取得できませんでした";
         });
     },
@@ -154,8 +168,10 @@ function loadNearbyPosts() {
 
       const nearbyPosts = document.getElementById("nearbyPosts");
 
+      nearbyPosts.setAttribute("aria-busy", "false");
       nearbyPosts.textContent = "位置情報を取得できませんでした";
     },
+    { timeout: 10000, maximumAge: 30000 },
   );
 }
 

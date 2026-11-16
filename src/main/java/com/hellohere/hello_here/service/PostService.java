@@ -1,31 +1,33 @@
 package com.hellohere.hello_here.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.hellohere.hello_here.entity.Post;
-import com.hellohere.hello_here.repository.NearbyPostProjection;
-import com.hellohere.hello_here.repository.PostRepository;
 import com.hellohere.hello_here.dto.NearbyPostDto;
 import com.hellohere.hello_here.dto.ProfilePostDto;
-import com.hellohere.hello_here.entity.User;
-import com.hellohere.hello_here.repository.UserRepository;
+import com.hellohere.hello_here.entity.Post;
 import com.hellohere.hello_here.entity.PostImage;
+import com.hellohere.hello_here.entity.User;
+import com.hellohere.hello_here.repository.NearbyPostProjection;
 import com.hellohere.hello_here.repository.PostImageRepository;
+import com.hellohere.hello_here.repository.PostRepository;
+import com.hellohere.hello_here.repository.UserRepository;
 
 @Service
 public class PostService {
@@ -45,7 +47,6 @@ public class PostService {
 
     public PostService(PostRepository postRepository, UserRepository userRepository,
             PostImageRepository postImageRepository) {
-
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.postImageRepository = postImageRepository;
@@ -146,9 +147,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません"));
 
         Post post = new Post();
-
         post.setContent(normalizedContent);
-
         post.setLatitude(latitude);
         post.setLongitude(longitude);
         post.setUser(user);
@@ -186,18 +185,13 @@ public class PostService {
                 postImageRepository.save(postImage);
             }
 
+            registerRollbackCleanup(savedFiles);
             return savedPost;
 
-        } catch (Exception e) {
-            for (Path savedFile : savedFiles) {
-                try {
-                    Files.deleteIfExists(savedFile);
-                } catch (IOException deleteError) {
-                    log.warn("保存途中の投稿画像を削除できませんでした: {}", savedFile, deleteError);
-                }
-            }
+        } catch (Exception exception) {
+            deleteSavedFiles(savedFiles);
 
-            throw e;
+            throw exception;
         }
     }
 
@@ -208,20 +202,28 @@ public class PostService {
 
         String contentType = imageFile.getContentType();
         String extension;
+        String expectedFormat;
 
         if ("image/png".equals(contentType)) {
             extension = ".png";
+            expectedFormat = "png";
         } else if ("image/jpeg".equals(contentType)) {
             extension = ".jpg";
+            expectedFormat = "jpeg";
         } else {
             throw new IllegalArgumentException("PNGまたはJPEG画像を選択してください");
         }
 
-        ImageFileValidator.ImageDimensions dimensions =
+        ImageFileValidator.ImageMetadata metadata =
                 ImageFileValidator.inspectHeader(imageFile);
 
-        if (dimensions.width() > MAX_POST_IMAGE_DIMENSION
-                || dimensions.height() > MAX_POST_IMAGE_DIMENSION) {
+        if (!expectedFormat.equals(metadata.formatName())) {
+            throw new IllegalArgumentException(
+                    "画像ファイルの形式とContent-Typeが一致しません");
+        }
+
+        if (metadata.width() > MAX_POST_IMAGE_DIMENSION
+                || metadata.height() > MAX_POST_IMAGE_DIMENSION) {
             throw new IllegalArgumentException("投稿画像は縦横4096px以下にしてください");
         }
 
@@ -249,7 +251,34 @@ public class PostService {
         }
     }
 
-    private record ValidatedPostImage(MultipartFile file, String extension) {
+    private void registerRollbackCleanup(List<Path> savedFiles) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            return;
+        }
+
+        List<Path> filesToDelete = List.copyOf(savedFiles);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (status != TransactionSynchronization.STATUS_COMMITTED) {
+                            deleteSavedFiles(filesToDelete);
+                        }
+                    }
+                });
     }
 
+    private void deleteSavedFiles(List<Path> savedFiles) {
+        for (Path savedFile : savedFiles) {
+            try {
+                Files.deleteIfExists(savedFile);
+            } catch (IOException deleteError) {
+                log.warn("保存途中の投稿画像を削除できませんでした: {}", savedFile,
+                        deleteError);
+            }
+        }
+    }
+
+    private record ValidatedPostImage(MultipartFile file, String extension) {
+    }
 }

@@ -29,13 +29,13 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 @Controller
-public class homeController {
+public class HomeController {
 
-    private static final Logger log = LoggerFactory.getLogger(homeController.class);
+    private static final Logger log = LoggerFactory.getLogger(HomeController.class);
 
     private final PostService postService;
 
-    public homeController(PostService postService) {
+    public HomeController(PostService postService) {
         this.postService = postService;
     }
 

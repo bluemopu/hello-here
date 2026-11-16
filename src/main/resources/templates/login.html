@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,37 +14,46 @@
       <h1>Hello Here</h1>
     </div>
 
-    <div class="enter_field">
-      <div class="user_name_box">
-        <img src="/image/person.png" class="person_icon" alt="" />
-        <input
-          type="email"
-          id="email"
-          class="user_name"
-          placeholder="Email"
-          autocomplete="email"
-        />
+    <form id="loginForm" class="login_form">
+      <div class="enter_field">
+        <div class="user_name_box">
+          <img src="/image/person.png" class="person_icon" alt="" />
+          <label class="visually_hidden" for="email">メールアドレス</label>
+          <input
+            type="email"
+            id="email"
+            class="user_name"
+            placeholder="Email"
+            autocomplete="email"
+            maxlength="255"
+            required
+          />
+        </div>
+
+        <div class="password_box">
+          <img src="/image/lock.png" class="lock_icon" alt="" />
+          <label class="visually_hidden" for="password">パスワード</label>
+          <input
+            type="password"
+            id="password"
+            class="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            minlength="8"
+            maxlength="128"
+            required
+          />
+        </div>
       </div>
 
-      <div class="password_box">
-        <img src="/image/lock.png" class="lock_icon" alt="" />
-        <input
-          type="password"
-          id="password"
-          class="password"
-          placeholder="Password"
-          autocomplete="current-password"
-        />
+      <div class="enter_button">
+        <button type="submit" class="login" id="loginButton">Login</button>
+
+        <button type="button" class="sign_up" id="signUpButton">Sign up</button>
       </div>
-    </div>
 
-    <div class="enter_button">
-      <button type="button" class="login" id="loginButton">Login</button>
-
-      <button type="button" class="sign_up" id="signUpButton">Sign up</button>
-    </div>
-
-    <p id="result"></p>
+      <p id="result" role="status" aria-live="polite"></p>
+    </form>
 
     <script src="/js/csrf.js"></script>
     <script src="/js/login.js"></script>

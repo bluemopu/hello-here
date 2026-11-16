@@ -12,19 +12,13 @@
 	<artifactId>hello-here</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>hello-here</name>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
+	<description>Location-based community posting web application</description>
+	<url>https://github.com/bluemopu/hello-here</url>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/bluemopu/hello-here.git</connection>
+		<developerConnection>scm:git:https://github.com/bluemopu/hello-here.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/bluemopu/hello-here</url>
 	</scm>
 	<properties>
 		<java.version>17</java.version>

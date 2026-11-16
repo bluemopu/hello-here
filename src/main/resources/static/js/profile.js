@@ -30,7 +30,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const MIN_IMAGE_SIZE = 200;
 
-const MAX_IMAGE_SIZE = 8000;
+const MAX_IMAGE_SIZE = 4096;
 
 const OUTPUT_IMAGE_SIZE = 512;
 
@@ -177,6 +177,9 @@ if (saveProfileButton) {
       return;
     }
 
+    saveProfileButton.disabled = true;
+    setResult("プロフィールを更新しています...");
+
     csrfFetch("/profile/update", {
       method: "POST",
 
@@ -213,6 +216,9 @@ if (saveProfileButton) {
         console.error("プロフィール更新エラー:", error);
 
         setResult(error.message);
+      })
+      .finally(() => {
+        saveProfileButton.disabled = false;
       });
   });
 }
@@ -272,7 +278,7 @@ avatarInput.addEventListener("change", function () {
     ) {
       URL.revokeObjectURL(objectUrl);
 
-      setResult("画像は縦横8000px以下にしてください");
+      setResult("画像は縦横4096px以下にしてください");
 
       avatarInput.value = "";
 
@@ -467,6 +473,7 @@ uploadAvatarButton.addEventListener("click", function () {
   formData.append("avatar", editedAvatarBlob, "avatar.png");
 
   setResult("アイコンを保存しています...");
+  uploadAvatarButton.disabled = true;
 
   csrfFetch("/profile/avatar", {
     method: "POST",
@@ -512,6 +519,9 @@ uploadAvatarButton.addEventListener("click", function () {
       console.error("アイコン変更エラー:", error);
 
       setResult(error.message || "アイコンの変更に失敗しました");
+    })
+    .finally(() => {
+      uploadAvatarButton.disabled = false;
     });
 });
 
@@ -524,6 +534,8 @@ deletePostButtons.forEach(function (button) {
     if (!postId || !window.confirm("この投稿を削除しますか？")) {
       return;
     }
+
+    button.disabled = true;
 
     try {
       const response = await csrfFetch("/posts/" + postId, {
@@ -559,6 +571,10 @@ deletePostButtons.forEach(function (button) {
     } catch (error) {
       console.error("投稿削除エラー:", error);
       setResult(error.message);
+    } finally {
+      if (button.isConnected) {
+        button.disabled = false;
+      }
     }
   });
 });
@@ -573,7 +589,7 @@ function showNoPostMessage() {
   const existingMessage = profilePosts.querySelector(".no_profile_posts");
 
   if (existingMessage) {
-    existingMessage.computedStyleMap.display = "block";
+    existingMessage.style.display = "block";
 
     return;
   }

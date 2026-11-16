@@ -1,6 +1,8 @@
 const logoutButton = document.getElementById("logoutButton");
 
 logoutButton.addEventListener("click", function () {
+  logoutButton.disabled = true;
+
   csrfFetch("/logout", {
     method: "POST",
   })
@@ -16,5 +18,8 @@ logoutButton.addEventListener("click", function () {
     })
     .catch((error) => {
       console.error(error);
+    })
+    .finally(() => {
+      logoutButton.disabled = false;
     });
 });

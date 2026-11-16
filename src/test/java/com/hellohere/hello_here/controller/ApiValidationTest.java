@@ -1,6 +1,7 @@
 package com.hellohere.hello_here.controller;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,17 +23,18 @@ class ApiValidationTest {
 
     private MockMvc mockMvc;
     private PostService postService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
-        UserService userService = mock(UserService.class);
+        userService = mock(UserService.class);
         postService = mock(PostService.class);
 
         mockMvc = MockMvcBuilders.standaloneSetup(
                 new AuthController(userService),
-                new homeController(postService),
+                new HomeController(postService),
                 new ProfileController(userService, postService))
                 .setControllerAdvice(new ApiExceptionHandler())
                 .setValidator(validator)
@@ -48,6 +50,19 @@ class ApiValidationTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("メールアドレスの形式が正しくありません"));
+    }
+
+    @Test
+    void loginRejectsInvalidEmailBeforeAuthentication() throws Exception {
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"invalid","password":"password"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("メールアドレスの形式が正しくありません"));
+
+        verifyNoInteractions(userService);
     }
 
     @Test
